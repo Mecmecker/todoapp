@@ -1,6 +1,6 @@
 # todoapp
 
-A new Flutter project.
+Todo app using SQLite as backend
 
 ## Getting Started
 
