@@ -108,4 +108,17 @@ class DatabaseRepository {
     final path = join(documents.path + _databaseName);
     databaseFactory.deleteDatabase(path);
   }
+
+  Future<List<Todo>> todoHelp(String suggest) async {
+    final db = await database;
+    List<Map<String, dynamic>> allRows = await db!.query('todos',
+        where: 'what LIKE ?',
+        whereArgs: ['%$suggest%'],
+        distinct: true,
+        groupBy: 'what');
+
+    return allRows.isNotEmpty
+        ? allRows.map((todos) => Todo.fromJson(todos)).toList()
+        : [];
+  }
 }

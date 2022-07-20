@@ -11,10 +11,24 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
+  late TextEditingController _controller;
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final todoProvider = Provider.of<TodoProvider>(context);
     List<Todo> scans = todoProvider.todos;
+
     _removeCheck() {
       for (var todo in scans) {
         if (todo.done == true) todoProvider.borrarTodoId(todo);
@@ -48,6 +62,7 @@ class _TodoScreenState extends State<TodoScreen> {
     }
 
     final arg = ModalRoute.of(context)!.settings.arguments;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista ${arg as String}'),
@@ -76,6 +91,14 @@ class _TodoScreenState extends State<TodoScreen> {
           ),
           ListView.builder(
             itemBuilder: (_, int i) => InkWell(
+              onLongPress: () {
+                _editar(context).then((what) {
+                  if (what != null) {
+                    scans[i].what = what;
+                    todoProvider.modificarTodoId(scans[i]);
+                  }
+                });
+              },
               onTap: () {
                 setState(() {
                   scans[i].toggleDone();
@@ -105,5 +128,32 @@ class _TodoScreenState extends State<TodoScreen> {
         ],
       ),
     );
+  }
+
+  Future<dynamic> _editar(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text('Editar'),
+              content: TextField(
+                controller: _controller,
+                autofocus: true,
+                onSubmitted: (what) => Navigator.of(context).pop(what),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_controller.text);
+                  },
+                  child: const Text('Editar'),
+                ),
+              ],
+            ));
   }
 }

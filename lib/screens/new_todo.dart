@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../data/todos_provider.dart';
+import '../models/models.dart';
 
 class NewTodoPage extends StatefulWidget {
   const NewTodoPage({Key? key}) : super(key: key);
@@ -23,6 +27,7 @@ class _NewTodoPageState extends State<NewTodoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final todoProvider = Provider.of<TodoProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('New todo..'),
@@ -35,12 +40,39 @@ class _NewTodoPageState extends State<NewTodoPage> {
             TextField(
               controller: _controller,
               onSubmitted: (what) => Navigator.of(context).pop(what),
+              onChanged: (value) {
+                if (value != '') todoProvider.suggestions(value);
+              },
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(_controller.text);
               },
               child: const Text('Añadir'),
+            ),
+            Expanded(
+              child: StreamBuilder(
+                stream: todoProvider.suggestionStream,
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Todo>> snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  }
+                  final List<Todo> todos = snapshot.data!;
+
+                  return ListView.separated(
+                      itemBuilder: ((context, index) => GestureDetector(
+                            onTap: () =>
+                                Navigator.of(context).pop(todos[index].what),
+                            child: ListTile(
+                              title: Text(todos[index].what),
+                            ),
+                          )),
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(color: Colors.grey, height: 2),
+                      itemCount: todos.length);
+                },
+              ),
             )
           ],
         ),
