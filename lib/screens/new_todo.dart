@@ -44,11 +44,26 @@ class _NewTodoPageState extends State<NewTodoPage> {
                 if (value != '') todoProvider.suggestions(value);
               },
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(_controller.text);
-              },
-              child: const Text('Añadir'),
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      todoProvider.nuevoScan(_controller.text);
+                      _controller.clear();
+                    }
+                  },
+                  child: const Text('Siguiente'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_controller.text);
+                  },
+                  child: const Text('Añadir'),
+                ),
+              ],
             ),
             Expanded(
               child: StreamBuilder(

@@ -12,11 +12,6 @@ class TodoScreen extends StatefulWidget {
 
 class _TodoScreenState extends State<TodoScreen> {
   late TextEditingController _controller;
-  @override
-  void initState() {
-    _controller = TextEditingController();
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -89,14 +84,16 @@ class _TodoScreenState extends State<TodoScreen> {
             decoration:
                 const BoxDecoration(color: Color.fromARGB(255, 233, 226, 135)),
           ),
-          ListView.builder(
+          ReorderableListView.builder(
             itemBuilder: (_, int i) => InkWell(
-              onLongPress: () {
-                _editar(context).then((what) {
-                  if (what != null) {
+              key: Key('$i'),
+              onDoubleTap: () {
+                _editar(context, scans[i].what).then((what) {
+                  if (what is String) {
                     scans[i].what = what;
                     todoProvider.modificarTodoId(scans[i]);
                   }
+                  return;
                 });
               },
               onTap: () {
@@ -124,13 +121,24 @@ class _TodoScreenState extends State<TodoScreen> {
               ),
             ),
             itemCount: scans.length,
+            onReorder: (int oldIndex, int newIndex) {
+              setState(() {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                final Todo item = scans.removeAt(oldIndex);
+                scans.insert(newIndex, item);
+              });
+            },
           ),
         ],
       ),
     );
   }
 
-  Future<dynamic> _editar(BuildContext context) {
+  Future<dynamic> _editar(BuildContext context, String texto) {
+    _controller = TextEditingController(text: texto);
+
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(

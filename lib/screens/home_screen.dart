@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Center(
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      primary: const Color.fromARGB(255, 0, 45, 150),
+                      foregroundColor: const Color.fromARGB(255, 0, 45, 150),
                       elevation: 2,
                       shape: const BeveledRectangleBorder(
                         borderRadius: BorderRadius.all(
