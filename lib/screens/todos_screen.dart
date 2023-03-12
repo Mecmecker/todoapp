@@ -11,14 +11,6 @@ class TodoScreen extends StatefulWidget {
 }
 
 class _TodoScreenState extends State<TodoScreen> {
-  late TextEditingController _controller;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final todoProvider = Provider.of<TodoProvider>(context);
@@ -137,17 +129,19 @@ class _TodoScreenState extends State<TodoScreen> {
   }
 
   Future<dynamic> _editar(BuildContext context, String texto) {
-    _controller = TextEditingController(text: texto);
+    TextEditingController _controller = TextEditingController(text: texto);
 
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Editar'),
               content: TextField(
-                controller: _controller,
-                autofocus: true,
-                onSubmitted: (what) => Navigator.of(context).pop(what),
-              ),
+                  controller: _controller,
+                  autofocus: true,
+                  onSubmitted: (what) {
+                    _controller.dispose();
+                    Navigator.of(context).pop(what);
+                  }),
               actions: [
                 TextButton(
                   onPressed: () {
